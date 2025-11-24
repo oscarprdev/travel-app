@@ -31,16 +31,19 @@ interface GetYourGuideActivity {
 
 export const searchActivities = async (destination: string): Promise<Activity[]> => {
   try {
-    const apiKey = process.env.GETYOURGUIDE_API_KEY;
+    const username = process.env.GETYOURGUIDE_USERNAME;
+    const password = process.env.GETYOURGUIDE_PASSWORD;
 
-    if (!apiKey) {
-      console.warn('GetYourGuide API key not configured');
+    if (!username || !password) {
+      console.warn('GetYourGuide credentials not configured');
       return [];
     }
 
+    const credentials = Buffer.from(`${username}:${password}`).toString('base64');
+
     const response = await fetch(`https://api.getyourguide.com/1/activities?q=${destination}`, {
       headers: {
-        'X-ACCESS-TOKEN': apiKey,
+        Authorization: `Basic ${credentials}`,
         Accept: 'application/json',
       },
     });
