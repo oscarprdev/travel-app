@@ -31,15 +31,17 @@ interface GetYourGuideActivity {
 
 export const searchActivities = async (destination: string): Promise<Activity[]> => {
   try {
+    console.log('[GetYourGuide] Searching activities', { destination });
     const username = process.env.GETYOURGUIDE_USERNAME;
     const password = process.env.GETYOURGUIDE_PASSWORD;
 
     if (!username || !password) {
-      console.warn('GetYourGuide credentials not configured');
+      console.warn('[GetYourGuide] Credentials not configured');
       return [];
     }
 
     const credentials = Buffer.from(`${username}:${password}`).toString('base64');
+    console.log('[GetYourGuide] Making API request');
 
     const response = await fetch(`https://api.getyourguide.com/1/activities?q=${destination}`, {
       headers: {
@@ -49,10 +51,12 @@ export const searchActivities = async (destination: string): Promise<Activity[]>
     });
 
     if (!response.ok) {
+      console.error('[GetYourGuide] API error', { status: response.status, statusText: response.statusText });
       throw new Error(`GetYourGuide API error: ${response.statusText}`);
     }
 
     const data = await response.json();
+    console.log('[GetYourGuide] Activities found', { count: data.activities?.length || 0 });
 
     return (
       data.activities?.slice(0, 20).map((activity: GetYourGuideActivity) => ({

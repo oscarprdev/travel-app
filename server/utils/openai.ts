@@ -15,6 +15,15 @@ export interface ItineraryData {
 
 export const generateItinerary = async (data: ItineraryData): Promise<string> => {
   try {
+    console.log('[OpenAI] Generating itinerary', {
+      origin: data.origin,
+      destination: data.destination,
+      budget: data.budget,
+      flights: data.flights.length,
+      hotels: data.hotels.length,
+      activities: data.activities.length
+    });
+
     const prompt = `Create a detailed travel itinerary for a trip from ${data.origin} to ${data.destination} with a total budget of ${data.budget} EUR.
 
 Available options:
@@ -30,6 +39,7 @@ Please provide:
 
 Format the response in markdown with clear sections.`;
 
+    console.log('[OpenAI] Sending request to GPT-4o-mini');
     const completion = await openai.chat.completions.create({
       model: 'gpt-4o-mini',
       messages: [
@@ -46,9 +56,10 @@ Format the response in markdown with clear sections.`;
       temperature: 0.7,
     });
 
+    console.log('[OpenAI] Itinerary generated successfully', { tokens: completion.usage?.total_tokens });
     return completion.choices[0].message.content || 'Unable to generate itinerary';
   } catch (error) {
-    console.error('OpenAI itinerary generation error:', error);
+    console.error('[OpenAI] Itinerary generation error:', error);
     throw new Error('Failed to generate itinerary');
   }
 };

@@ -27,22 +27,32 @@ export interface JobProgress {
 }
 
 export const enqueueJob = async (job: SearchJob) => {
+  console.log('[Redis] Enqueueing job', { sessionId: job.sessionId, origin: job.origin, destination: job.destination });
   await redis.lpush('travel_search_queue', JSON.stringify(job));
   await redis.set(`job:${job.sessionId}`, JSON.stringify({ status: 'queued' }), { ex: 3600 });
+  console.log('[Redis] Job enqueued successfully', { sessionId: job.sessionId });
 };
 
 export const getJobStatus = async (sessionId: string): Promise<JobProgress | null> => {
+  console.log('[Redis] Getting job status', { sessionId });
   const data = await redis.get(`job:${sessionId}`);
-  return data ? (typeof data === 'string' ? JSON.parse(data) : { ...data, status: 'queued' }) : null;
+  const result = data ? (typeof data === 'string' ? JSON.parse(data) : data) : null;
+  console.log('[Redis] Job status retrieved', { sessionId, status: result?.status });
+  return result;
 };
 
 export const updateJobStatus = async (sessionId: string, progress: JobProgress) => {
+  console.log('[Redis] Updating job status', { sessionId, status: progress.status, step: progress.currentStep });
   await redis.set(`job:${sessionId}`, JSON.stringify(progress), { ex: 3600 });
+  console.log('[Redis] Job status updated', { sessionId });
 };
 
 export const dequeueJob = async (): Promise<SearchJob | null> => {
+  console.log('[Redis] Attempting to dequeue job');
   const data = await redis.rpop('travel_search_queue');
-  return data ? (typeof data === 'string' ? JSON.parse(data) : data) : null;
+  const result = data ? (typeof data === 'string' ? JSON.parse(data) : data) : null;
+  console.log('[Redis] Dequeue result', { found: !!result, sessionId: result?.sessionId });
+  return result;
 };
 
 export { redis };

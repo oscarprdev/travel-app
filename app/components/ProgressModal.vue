@@ -131,7 +131,20 @@ const pollResults = async () => {
   }
 }
 
+const triggerWorker = async () => {
+  try {
+    console.log('[Frontend] Triggering queue processor')
+    await $fetch('/api/process-queue', { method: 'POST' })
+  } catch (error) {
+    console.error('[Frontend] Worker trigger error:', error)
+  }
+}
+
 onMounted(() => {
+  // Trigger worker immediately
+  triggerWorker()
+
+  // Start polling for results
   pollResults()
   pollInterval = setInterval(pollResults, 2000)
 })

@@ -39,6 +39,7 @@ export const searchFlights = async (
   returnDate?: string
 ): Promise<FlightOffer[]> => {
   try {
+    console.log('[Amadeus] Searching flights', { origin, destination, departureDate, returnDate });
     const response = await amadeus.shopping.flightOffersSearch.get({
       originLocationCode: origin,
       destinationLocationCode: destination,
@@ -48,6 +49,7 @@ export const searchFlights = async (
       max: '20',
     });
 
+    console.log('[Amadeus] Flights found', { count: response.data.length });
     return response.data.map((offer) => ({
       id: offer.id,
       price: parseFloat(offer.price.total),
@@ -79,15 +81,19 @@ export const searchHotels = async (
   checkOutDate: string
 ): Promise<HotelOffer[]> => {
   try {
+    console.log('[Amadeus] Searching hotels', { cityCode, checkInDate, checkOutDate });
     const hotelsResponse = await amadeus.referenceData.locations.hotels.byCity.get({
       cityCode,
     });
 
+    console.log('[Amadeus] Hotels locations found', { count: hotelsResponse.data.length });
     if (!hotelsResponse.data.length) {
+      console.log('[Amadeus] No hotels found for city');
       return [];
     }
 
     const hotelIds = hotelsResponse.data.slice(0, 20).map((hotel) => hotel.hotelId);
+    console.log('[Amadeus] Fetching offers for hotels', { count: hotelIds.length });
 
     const offersResponse = await amadeus.shopping.hotelOffersSearch.get({
       hotelIds: hotelIds.join(','),
@@ -96,6 +102,7 @@ export const searchHotels = async (
       adults: '1',
     });
 
+    console.log('[Amadeus] Hotel offers found', { count: offersResponse.data.length });
     return offersResponse.data.map((offer) => ({
       id: offer.hotel.hotelId,
       name: offer.hotel.name,
