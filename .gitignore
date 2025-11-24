@@ -23,6 +23,8 @@ logs
 .env.*
 !.env.example
 
+.vscode
+
 # CLAUDE / CURSOR / AI FILES
 
 .claude

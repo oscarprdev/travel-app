@@ -1,0 +1,19 @@
+# Build outputs
+.nuxt
+dist
+.output
+
+# Dependencies
+node_modules
+pnpm-lock.yaml
+package-lock.json
+yarn.lock
+
+# Generated files
+.nitro
+.cache
+coverage
+
+# Other
+*.min.js
+*.min.css

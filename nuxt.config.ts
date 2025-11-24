@@ -1,14 +1,9 @@
-import tailwindcss from "@tailwindcss/vite";
+import tailwindcss from '@tailwindcss/vite';
 
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
-  vite: {    plugins: [      tailwindcss(),    ],  },
+  vite: { plugins: [tailwindcss()] },
   css: ['./app/assets/css/main.css'],
-  modules: [
-    '@nuxt/eslint',
-    '@nuxt/image',
-    '@nuxt/test-utils',
-    '@nuxt/ui'
-  ]
-})
+  modules: ['@nuxt/eslint', '@nuxt/image', '@nuxt/test-utils', '@nuxt/ui'],
+});
